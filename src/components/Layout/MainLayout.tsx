@@ -14,6 +14,15 @@ import {
   NodeIndexOutlined,
   ApiOutlined,
   BookOutlined,
+  CodeOutlined,
+  DatabaseOutlined,
+  ClusterOutlined,
+  AppstoreOutlined,
+  ReadOutlined,
+  ControlOutlined,
+  UsergroupAddOutlined,
+  BugOutlined,
+  DeploymentUnitOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -60,6 +69,51 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       key: '/vocabulary',
       icon: <BookOutlined />,
       label: '领域词汇',
+    },
+    {
+      key: '/code/analysis',
+      icon: <CodeOutlined />,
+      label: '代码分析',
+    },
+    {
+      key: '/entity/model',
+      icon: <DatabaseOutlined />,
+      label: '实体模型',
+    },
+    {
+      key: '/system/architecture',
+      icon: <ClusterOutlined />,
+      label: '系统架构',
+    },
+    {
+      key: '/plugins',
+      icon: <AppstoreOutlined />,
+      label: '插件市场',
+    },
+    {
+      key: '/knowledge',
+      icon: <ReadOutlined />,
+      label: '技术知识库',
+    },
+    {
+      key: '/project/management',
+      icon: <ControlOutlined />,
+      label: '项目管理',
+    },
+    {
+      key: '/user/management',
+      icon: <UsergroupAddOutlined />,
+      label: '用户管理',
+    },
+    {
+      key: '/test/platform',
+      icon: <BugOutlined />,
+      label: '测试平台',
+    },
+    {
+      key: '/deployment/platform',
+      icon: <DeploymentUnitOutlined />,
+      label: '部署平台',
     },
     {
       key: '/mcp/console',
@@ -161,6 +215,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {location.pathname === '/templates' && '模板中心'}
               {location.pathname === '/collaboration' && '项目协作'}
               {location.pathname === '/vocabulary' && '领域词汇管理'}
+              {location.pathname === '/code/analysis' && '代码分析'}
+              {location.pathname === '/entity/model' && '实体模型设计'}
+              {location.pathname === '/system/architecture' && '系统架构设计'}
+              {location.pathname === '/plugins' && '插件市场'}
+              {location.pathname === '/knowledge' && '技术知识库'}
+              {location.pathname === '/project/management' && '项目管理'}
+              {location.pathname === '/user/management' && '用户管理'}
+              {location.pathname === '/test/platform' && '测试平台'}
+              {location.pathname === '/deployment/platform' && '部署平台'}
               {location.pathname === '/mcp/console' && 'MCP协议'}
               {location.pathname === '/profile' && '用户中心'}
             </div>

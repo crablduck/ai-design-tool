@@ -25,7 +25,7 @@ const Entity3DComponent: React.FC<{
   const [hovered, setHovered] = useState(false);
 
   useFrame((state) => {
-    if (meshRef.current && entity.animations) {
+    if (meshRef.current) {
       // 简单的旋转动画
       meshRef.current.rotation.y += 0.01;
     }
@@ -52,26 +52,26 @@ const Entity3DComponent: React.FC<{
       />
     );
 
-    switch (entity.shape) {
-      case '3d-sphere':
+    switch (entity.geometry) {
+      case 'sphere':
         return (
           <Sphere {...props} args={[1, 32, 32]}>
             {material}
           </Sphere>
         );
-      case '3d-cylinder':
+      case 'cylinder':
         return (
           <Cylinder {...props} args={[1, 1, 2, 32]}>
             {material}
           </Cylinder>
         );
-      case '3d-pyramid':
+      case 'pyramid':
         return (
           <Cone {...props} args={[1, 2, 8]}>
             {material}
           </Cone>
         );
-      default: // 3d-box
+      default: // box
         return (
           <Box {...props} args={[2, 1, 1]}>
             {material}
@@ -102,7 +102,7 @@ const Entity3DComponent: React.FC<{
           <div className="bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs max-w-xs">
             <div className="font-semibold">{entity.name}</div>
             <div className="mt-1">
-              <div className="text-gray-300">类型: {entity.type}</div>
+              <div className="text-gray-300">几何体: {entity.geometry}</div>
               <div className="text-gray-300">颜色: {entity.color}</div>
             </div>
           </div>
@@ -118,8 +118,8 @@ const Relationship3DComponent: React.FC<{
   entities: Entity3D[];
   onClick?: () => void;
 }> = ({ relationship, entities, onClick }) => {
-  const sourceEntity = entities.find(e => e.id === relationship.source);
-  const targetEntity = entities.find(e => e.id === relationship.target);
+  const sourceEntity = entities.find(e => e.id === relationship.sourceEntityId);
+  const targetEntity = entities.find(e => e.id === relationship.targetEntityId);
 
   if (!sourceEntity || !targetEntity) return null;
 
@@ -153,7 +153,7 @@ const Relationship3DComponent: React.FC<{
         anchorX="center"
         anchorY="middle"
       >
-        {relationship.type}
+        {relationship.relationshipType}
       </Text>
     </group>
   );
@@ -456,7 +456,7 @@ const DomainModel3D: React.FC<DomainModel3DProps> = ({
               <div>
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">{entity.name}</h4>
                 <div className="text-xs text-gray-600 space-y-1">
-                  <div>类型: {entity.type}</div>
+                  <div>几何体: {entity.geometry}</div>
                   <div>位置: ({entity.position.x.toFixed(1)}, {entity.position.y.toFixed(1)}, {entity.position.z.toFixed(1)})</div>
                   <div>颜色: {entity.color}</div>
                 </div>

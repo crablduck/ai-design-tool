@@ -140,7 +140,7 @@ export interface DomainRelationship {
 export interface KnowledgeGraphNode {
   id: string;
   label: string;
-  type: 'concept' | 'entity' | 'relationship' | 'attribute';
+  type: 'concept' | 'entity' | 'relationship' | 'attribute' | 'event';
   properties: Record<string, any>;
   connections: KnowledgeGraphEdge[];
 }
@@ -336,6 +336,7 @@ export interface AnimationKeyframe {
 
 // 可扩展文档类型注册
 export interface DocumentTypeDefinition {
+  id: string;
   type: string;
   name: string;
   description: string;
@@ -352,6 +353,9 @@ export type DocumentCategory = 'core-asset' | 'diagram' | 'specification' | 'ana
 
 // 文档生成器接口
 export interface DocumentGenerator {
+  id?: string;
+  name?: string;
+  description?: string;
   generate(input: any, options?: GenerationOptions): Promise<BaseDocument>;
   validate(input: any): ValidationResult;
   getRequiredInputs(): InputDefinition[];
@@ -514,6 +518,12 @@ export interface Plugin {
   dependencies?: string[];
   config?: PluginConfig;
   enabled: boolean;
+  
+  // 生命周期方法
+  onRegister?: (context: PluginContext) => Promise<void> | void;
+  onUnregister?: (context: PluginContext) => Promise<void> | void;
+  onEnable?: (context: PluginContext) => Promise<void> | void;
+  onDisable?: (context: PluginContext) => Promise<void> | void;
 }
 
 export type PluginCategory = 'generator' | 'renderer' | 'exporter' | 'validator' | 'integration' | 'utility';
@@ -534,6 +544,79 @@ export interface PluginResource {
   type: 'template' | 'schema' | 'asset' | 'config';
   path: string;
   required: boolean;
+}
+
+export interface PluginContext {
+  plugin: Plugin;
+  api: PluginAPI;
+  storage: PluginStorage;
+  logger: PluginLogger;
+}
+
+export interface PluginAPI {
+  registerDocumentType: (type: DocumentTypeDefinition) => void;
+  unregisterDocumentType: (id: string) => void;
+  registerGenerator: (generator: DocumentGenerator) => void;
+  unregisterGenerator: (id: string) => void;
+  registerRenderer: (renderer: DocumentRenderer) => void;
+  unregisterRenderer: (id: string) => void;
+  registerExporter: (exporter: DocumentExporter) => void;
+  unregisterExporter: (id: string) => void;
+  registerValidator: (validator: DocumentValidator) => void;
+  unregisterValidator: (id: string) => void;
+  addHook: (event: string, callback: Function) => void;
+  removeHook: (event: string, callback: Function) => void;
+  triggerEvent: (event: string, data?: any) => Promise<void>;
+}
+
+export interface PluginStorage {
+  get: (key: string) => Promise<any>;
+  set: (key: string, value: any) => Promise<void>;
+  delete: (key: string) => Promise<void>;
+  clear: () => Promise<void>;
+  keys: () => Promise<string[]>;
+}
+
+export interface PluginLogger {
+  debug: (message: string, ...args: any[]) => void;
+  info: (message: string, ...args: any[]) => void;
+  warn: (message: string, ...args: any[]) => void;
+  error: (message: string, ...args: any[]) => void;
+}
+
+export interface PluginManifest {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  author: string;
+  category: PluginCategory;
+  main: string;
+  dependencies?: string[];
+  permissions?: PluginPermission[];
+  resources?: PluginResource[];
+  config?: Record<string, any>;
+}
+
+export interface PluginHook {
+  event: string;
+  callback: Function;
+  priority?: number;
+  once?: boolean;
+}
+
+export interface PluginInstance {
+  plugin: Plugin;
+  context?: PluginContext;
+  loaded: boolean;
+  enabled: boolean;
+  error?: string;
+}
+
+export interface PluginEvent {
+  type: 'install' | 'uninstall' | 'enable' | 'disable' | 'error' | string;
+  data?: any;
+  timestamp: Date;
 }
 
 // MCP协议相关类型

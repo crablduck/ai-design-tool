@@ -29,10 +29,9 @@ const QASystem: React.FC<QASystemProps> = ({
       category: 'domain-modeling',
       tags: ['DDD', '领域驱动设计', '软件架构'],
 
-      sources: ['Eric Evans - Domain-Driven Design'],
-      confidence: 0.95,
-      lastVerified: new Date(),
-      aiGenerated: false
+      source: 'Eric Evans - Domain-Driven Design',
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
       id: '2',
@@ -41,10 +40,9 @@ const QASystem: React.FC<QASystemProps> = ({
       category: 'domain-modeling',
       tags: ['聚合根', 'DDD', '实体'],
 
-      sources: ['DDD Reference'],
-      confidence: 0.92,
-      lastVerified: new Date(),
-      aiGenerated: false
+      source: 'DDD Reference',
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     {
       id: '3',
@@ -53,10 +51,9 @@ const QASystem: React.FC<QASystemProps> = ({
       category: 'requirements',
       tags: ['用例图', 'UML', '需求分析'],
 
-      sources: ['UML 2.0 Specification'],
-      confidence: 0.88,
-      lastVerified: new Date(),
-      aiGenerated: false
+      source: 'UML 2.0 Specification',
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ];
 

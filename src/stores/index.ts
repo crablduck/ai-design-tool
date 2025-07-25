@@ -222,13 +222,20 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         setCurrentUseCaseModel: (model) => set({ currentUseCaseModel: model }),
         
         addUseCaseModel: (model) => set((state) => {
-          const newMap = new Map(state.useCaseModels);
+          // 确保useCaseModels是Map对象
+          const currentModels = state.useCaseModels instanceof Map 
+            ? state.useCaseModels 
+            : new Map(Array.isArray(state.useCaseModels) ? state.useCaseModels : []);
+          const newMap = new Map(currentModels) as Map<string, UseCaseModel>;
           newMap.set(model.id, model);
           return { useCaseModels: newMap };
         }),
         
         updateUseCaseModel: (id, updates) => set((state) => {
-          const newMap = new Map(state.useCaseModels);
+          const currentModels = state.useCaseModels instanceof Map 
+            ? state.useCaseModels 
+            : new Map(Array.isArray(state.useCaseModels) ? state.useCaseModels : []);
+          const newMap = new Map(currentModels) as Map<string, UseCaseModel>;
           const existing = newMap.get(id);
           if (existing) {
             newMap.set(id, { ...existing, ...updates });
@@ -237,7 +244,10 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         }),
         
         removeUseCaseModel: (id) => set((state) => {
-          const newMap = new Map(state.useCaseModels);
+          const currentModels = state.useCaseModels instanceof Map 
+            ? state.useCaseModels 
+            : new Map(Array.isArray(state.useCaseModels) ? state.useCaseModels : []);
+          const newMap = new Map(currentModels) as Map<string, UseCaseModel>;
           newMap.delete(id);
           return { 
             useCaseModels: newMap,
@@ -248,13 +258,19 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         setCurrentDomainModel: (model) => set({ currentDomainModel: model }),
         
         addDomainModel: (model) => set((state) => {
-          const newMap = new Map(state.domainModels);
+          const currentModels = state.domainModels instanceof Map 
+            ? state.domainModels 
+            : new Map(Array.isArray(state.domainModels) ? state.domainModels : []);
+          const newMap = new Map(currentModels) as Map<string, DomainModel>;
           newMap.set(model.id, model);
           return { domainModels: newMap };
         }),
         
         updateDomainModel: (id, updates) => set((state) => {
-          const newMap = new Map(state.domainModels);
+          const currentModels = state.domainModels instanceof Map 
+            ? state.domainModels 
+            : new Map(Array.isArray(state.domainModels) ? state.domainModels : []);
+          const newMap = new Map(currentModels) as Map<string, DomainModel>;
           const existing = newMap.get(id);
           if (existing) {
             newMap.set(id, { ...existing, ...updates });
@@ -263,7 +279,10 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         }),
         
         removeDomainModel: (id) => set((state) => {
-          const newMap = new Map(state.domainModels);
+          const currentModels = state.domainModels instanceof Map 
+            ? state.domainModels 
+            : new Map(Array.isArray(state.domainModels) ? state.domainModels : []);
+          const newMap = new Map(currentModels) as Map<string, DomainModel>;
           newMap.delete(id);
           return { 
             domainModels: newMap,
@@ -274,13 +293,19 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         setCurrentBusinessProcess: (process) => set({ currentBusinessProcess: process }),
         
         addBusinessProcess: (process) => set((state) => {
-          const newMap = new Map(state.businessProcesses);
+          const currentProcesses = state.businessProcesses instanceof Map 
+            ? state.businessProcesses 
+            : new Map(Array.isArray(state.businessProcesses) ? state.businessProcesses : []);
+          const newMap = new Map(currentProcesses) as Map<string, MermaidChart>;
           newMap.set(process.id, process);
           return { businessProcesses: newMap };
         }),
         
         updateBusinessProcess: (id, updates) => set((state) => {
-          const newMap = new Map(state.businessProcesses);
+          const currentProcesses = state.businessProcesses instanceof Map 
+            ? state.businessProcesses 
+            : new Map(Array.isArray(state.businessProcesses) ? state.businessProcesses : []);
+          const newMap = new Map(currentProcesses) as Map<string, MermaidChart>;
           const existing = newMap.get(id);
           if (existing) {
             newMap.set(id, { ...existing, ...updates });
@@ -289,7 +314,10 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         }),
         
         removeBusinessProcess: (id) => set((state) => {
-          const newMap = new Map(state.businessProcesses);
+          const currentProcesses = state.businessProcesses instanceof Map 
+            ? state.businessProcesses 
+            : new Map(Array.isArray(state.businessProcesses) ? state.businessProcesses : []);
+          const newMap = new Map(currentProcesses) as Map<string, MermaidChart>;
           newMap.delete(id);
           return { 
             businessProcesses: newMap,
@@ -298,7 +326,117 @@ export const useCoreAssetsStore = create<CoreAssetsState>()(devtools(persist(
         })
       }),
       {
-        name: 'core-assets-storage'
+        name: 'core-assets-storage',
+        storage: {
+          getItem: (name) => {
+            try {
+              const str = localStorage.getItem(name);
+              if (!str) return null;
+              const data = JSON.parse(str);
+              // 恢复Map对象
+              if (data.state) {
+                // 安全地恢复 useCaseModels
+                if (data.state.useCaseModels) {
+                  if (Array.isArray(data.state.useCaseModels)) {
+                    try {
+                      data.state.useCaseModels = new Map(data.state.useCaseModels);
+                    } catch (e) {
+                      console.warn('Failed to restore useCaseModels Map:', e);
+                      data.state.useCaseModels = new Map();
+                    }
+                  } else if (!(data.state.useCaseModels instanceof Map)) {
+                    data.state.useCaseModels = new Map();
+                  }
+                } else {
+                  data.state.useCaseModels = new Map();
+                }
+                
+                // 安全地恢复 domainModels
+                if (data.state.domainModels) {
+                  if (Array.isArray(data.state.domainModels)) {
+                    try {
+                      data.state.domainModels = new Map(data.state.domainModels);
+                    } catch (e) {
+                      console.warn('Failed to restore domainModels Map:', e);
+                      data.state.domainModels = new Map();
+                    }
+                  } else if (!(data.state.domainModels instanceof Map)) {
+                    data.state.domainModels = new Map();
+                  }
+                } else {
+                  data.state.domainModels = new Map();
+                }
+                
+                // 安全地恢复 businessProcesses
+                if (data.state.businessProcesses) {
+                  if (Array.isArray(data.state.businessProcesses)) {
+                    try {
+                      data.state.businessProcesses = new Map(data.state.businessProcesses);
+                    } catch (e) {
+                      console.warn('Failed to restore businessProcesses Map:', e);
+                      data.state.businessProcesses = new Map();
+                    }
+                  } else if (!(data.state.businessProcesses instanceof Map)) {
+                    data.state.businessProcesses = new Map();
+                  }
+                } else {
+                  data.state.businessProcesses = new Map();
+                }
+              }
+              return data;
+            } catch (error) {
+              console.error('Error parsing stored data:', error);
+              return null;
+            }
+          },
+          setItem: (name, value) => {
+            try {
+              const data = { ...value };
+              // 序列化Map对象
+              if (data.state) {
+                // 安全地序列化 useCaseModels
+                if (data.state.useCaseModels instanceof Map) {
+                  try {
+                    (data.state as any).useCaseModels = Array.from(data.state.useCaseModels.entries());
+                  } catch (e) {
+                    console.warn('Failed to serialize useCaseModels Map:', e);
+                    (data.state as any).useCaseModels = [];
+                  }
+                } else if (data.state.useCaseModels && !Array.isArray(data.state.useCaseModels)) {
+                  (data.state as any).useCaseModels = [];
+                }
+                
+                // 安全地序列化 domainModels
+                if (data.state.domainModels instanceof Map) {
+                  try {
+                    (data.state as any).domainModels = Array.from(data.state.domainModels.entries());
+                  } catch (e) {
+                    console.warn('Failed to serialize domainModels Map:', e);
+                    (data.state as any).domainModels = [];
+                  }
+                } else if (data.state.domainModels && !Array.isArray(data.state.domainModels)) {
+                  (data.state as any).domainModels = [];
+                }
+                
+                // 安全地序列化 businessProcesses
+                if (data.state.businessProcesses instanceof Map) {
+                  try {
+                    (data.state as any).businessProcesses = Array.from(data.state.businessProcesses.entries());
+                  } catch (e) {
+                    console.warn('Failed to serialize businessProcesses Map:', e);
+                    (data.state as any).businessProcesses = [];
+                  }
+                } else if (data.state.businessProcesses && !Array.isArray(data.state.businessProcesses)) {
+                  (data.state as any).businessProcesses = [];
+                }
+              }
+              localStorage.setItem(name, JSON.stringify(data));
+            } catch (error) {
+              console.error('Error storing data:', error);
+            }
+          },
+          removeItem: (name) => localStorage.removeItem(name)
+        }
       }
     ),
     { name: 'core-assets-store' }

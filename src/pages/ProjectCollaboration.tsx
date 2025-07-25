@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Row,
@@ -18,28 +18,32 @@ import {
   DatePicker,
   Progress,
   Badge,
-
+  message,
+  Alert
 } from 'antd';
 import {
   TeamOutlined,
   UserAddOutlined,
   MessageOutlined,
   FileTextOutlined,
-
   SettingOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   ShareAltOutlined,
   ClockCircleOutlined,
-
+  WifiOutlined,
+  DisconnectOutlined
 } from '@ant-design/icons';
+import useCollaboration from '../hooks/useCollaboration';
+import CollaborationStatus from '../components/CollaborationStatus';
+import { OnlineUser } from '../services/collaborationService';
 
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
-const { TabPane } = Tabs;
+// const { TabPane } = Tabs; // 已弃用，使用items属性替代
 
 interface TeamMember {
   id: string;
@@ -91,6 +95,23 @@ const ProjectCollaboration: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<string>('1');
   const [form] = Form.useForm();
   const [taskForm] = Form.useForm();
+  
+  // 当前用户信息（实际项目中应从用户认证系统获取）
+  const currentUser: OnlineUser = {
+    id: '1',
+    name: '张三',
+    avatar: '',
+    status: 'active',
+    currentPage: '/collaboration',
+    lastActivity: Date.now()
+  };
+  
+  // 实时协作功能
+  const collaboration = useCollaboration({
+    projectId: selectedProject,
+    user: currentUser,
+    autoConnect: true
+  });
 
   // 模拟数据
   const [teamMembers] = useState<TeamMember[]>([
@@ -272,25 +293,122 @@ const ProjectCollaboration: React.FC = () => {
 
   const handleInviteMember = (values: any) => {
     console.log('邀请成员:', values);
+    
+    // 发送协作事件
+    collaboration.sendEvent({
+      type: 'user_join',
+      userId: 'new_user_id',
+      userName: values.email,
+      projectId: selectedProject,
+      data: {
+        email: values.email,
+        role: values.role,
+        message: values.message
+      }
+    });
+    
     setInviteModalVisible(false);
     form.resetFields();
+    message.success(`邀请已发送至 ${values.email}`);
   };
 
   const handleCreateTask = (values: any) => {
     console.log('创建任务:', values);
+    
+    // 发送协作事件
+    collaboration.updateTask('new_task', {
+      action: 'create',
+      title: values.title,
+      assignee: values.assignee
+    });
+    
     setTaskModalVisible(false);
     taskForm.resetFields();
+    message.success('任务创建成功');
   };
+  
+  // 监听协作事件
+  useEffect(() => {
+    const unsubscribe = collaboration.onEvent((event) => {
+      console.log('收到协作事件:', event);
+      
+      // 根据事件类型更新本地状态
+      switch (event.type) {
+        case 'task_update':
+          // 这里可以更新本地任务状态
+          break;
+        case 'comment_add':
+          // 这里可以更新评论列表
+          break;
+      }
+    });
+    
+    return unsubscribe;
+  }, [collaboration]);
+  
+  // 当项目切换时重新连接协作服务
+  useEffect(() => {
+    if (collaboration.isConnected) {
+      collaboration.disconnect();
+      setTimeout(() => {
+        collaboration.connect();
+      }, 100);
+    }
+  }, [selectedProject]);
 
   const currentProject = projects.find(p => p.id === selectedProject);
 
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <Title level={2} className="mb-2">项目协作</Title>
-        <Text className="text-lg text-gray-600">
-          与团队成员协作，共同推进项目进展
-        </Text>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <Title level={2} className="mb-2">项目协作</Title>
+            <Text className="text-lg text-gray-600">
+              与团队成员协作，共同推进项目进展
+            </Text>
+          </div>
+          
+          {/* 协作状态显示 */}
+          <CollaborationStatus
+            onlineUsers={collaboration.onlineUsers}
+            recentEvents={collaboration.recentEvents}
+            isConnected={collaboration.isConnected}
+            className="flex-shrink-0"
+          />
+        </div>
+        
+        {/* 连接状态提示 */}
+        {!collaboration.isConnected && (
+          <Alert
+            message="协作服务未连接"
+            description="实时协作功能暂时不可用，请检查网络连接或稍后重试。"
+            type="warning"
+            icon={<DisconnectOutlined />}
+            action={
+              <Button 
+                size="small" 
+                type="primary" 
+                loading={collaboration.isConnecting}
+                onClick={collaboration.connect}
+              >
+                重新连接
+              </Button>
+            }
+            className="mb-4"
+            closable
+          />
+        )}
+        
+        {collaboration.isConnected && collaboration.onlineUsers.length > 1 && (
+          <Alert
+            message={`当前有 ${collaboration.onlineUsers.length} 人在线协作`}
+            type="info"
+            icon={<WifiOutlined />}
+            className="mb-4"
+            closable
+          />
+        )}
       </div>
 
       {/* 项目选择 */}
@@ -332,9 +450,14 @@ const ProjectCollaboration: React.FC = () => {
         </Row>
       </Card>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        {/* 项目概览 */}
-        <TabPane tab="项目概览" key="overview">
+      <Tabs 
+        activeKey={activeTab} 
+        onChange={setActiveTab}
+        items={[
+          {
+            key: 'overview',
+            label: '项目概览',
+            children: (
           <Row gutter={[24, 24]}>
             <Col xs={24} lg={16}>
               {/* 项目信息 */}
@@ -412,7 +535,19 @@ const ProjectCollaboration: React.FC = () => {
             <Col xs={24} lg={8}>
               {/* 团队成员 */}
               <Card 
-                title="团队成员" 
+                title={
+                  <div className="flex items-center justify-between">
+                    <span>团队成员</span>
+                    {collaboration.isConnected && (
+                      <Badge 
+                        count={collaboration.onlineUsers.length} 
+                        showZero 
+                        style={{ backgroundColor: '#52c41a' }}
+                        title="在线人数"
+                      />
+                    )}
+                  </div>
+                }
                 extra={
                   <Button 
                     type="link" 
@@ -425,25 +560,56 @@ const ProjectCollaboration: React.FC = () => {
                 className="mb-6"
               >
                 <List
-                  dataSource={teamMembers}
-                  renderItem={member => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={
-                          <Badge dot status={member.status === 'online' ? 'success' : member.status === 'busy' ? 'warning' : 'default'}>
-                            <Avatar>{member.name[0]}</Avatar>
-                          </Badge>
-                        }
-                        title={member.name}
-                        description={
-                          <div>
-                            <div>{member.role}</div>
-                            <div className="text-xs">{getStatusBadge(member.status)}</div>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  )}
+                  dataSource={teamMembers.map(member => {
+                    // 查找对应的在线用户状态
+                    const onlineUser = collaboration.onlineUsers.find(u => u.id === member.id);
+                    return {
+                      ...member,
+                      isOnline: !!onlineUser,
+                      realTimeStatus: onlineUser?.status || 'offline'
+                    };
+                  })}
+                  renderItem={member => {
+                    const statusConfig = {
+                      active: { color: 'green', text: '活跃', dot: 'success' as const },
+                      idle: { color: 'orange', text: '空闲', dot: 'warning' as const },
+                      away: { color: 'gray', text: '离开', dot: 'default' as const },
+                      offline: { color: 'gray', text: '离线', dot: 'default' as const }
+                    };
+                    
+                    const currentStatus = member.isOnline ? member.realTimeStatus : 'offline';
+                    const config = statusConfig[currentStatus as keyof typeof statusConfig];
+                    
+                    return (
+                      <List.Item>
+                        <List.Item.Meta
+                          avatar={
+                            <Badge dot status={config.dot}>
+                              <Avatar>{member.name[0]}</Avatar>
+                            </Badge>
+                          }
+                          title={
+                            <div className="flex items-center justify-between">
+                              <span>{member.name}</span>
+                              {member.isOnline && (
+                                 <Tag color={config.color}>
+                                   {config.text}
+                                 </Tag>
+                               )}
+                            </div>
+                          }
+                          description={
+                            <div>
+                              <div>{member.role}</div>
+                              <div className="text-xs text-gray-500">
+                                {member.isOnline ? '在线' : '离线'}
+                              </div>
+                            </div>
+                          }
+                        />
+                      </List.Item>
+                    );
+                  }}
                 />
               </Card>
 
@@ -470,10 +636,12 @@ const ProjectCollaboration: React.FC = () => {
               </Card>
             </Col>
           </Row>
-        </TabPane>
-
-        {/* 任务管理 */}
-        <TabPane tab="任务管理" key="tasks">
+             )
+           },
+           {
+             key: 'tasks',
+             label: '任务管理',
+             children: (
           <Card 
             title="任务列表" 
             extra={
@@ -488,43 +656,84 @@ const ProjectCollaboration: React.FC = () => {
           >
             <List
               dataSource={tasks}
-              renderItem={task => (
-                <List.Item
-                  actions={[
-                    <Button type="link" icon={<EditOutlined />}>编辑</Button>,
-                    <Button type="link" danger icon={<DeleteOutlined />}>删除</Button>,
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={
-                      <div className="flex items-center justify-between">
-                        <span>{task.title}</span>
-                        <Space>
-                          {getTaskStatusTag(task.status)}
-                          {getPriorityTag(task.priority)}
-                        </Space>
-                      </div>
-                    }
-                    description={
-                      <div>
-                        <Paragraph ellipsis={{ rows: 2 }} className="mb-2">
-                          {task.description}
-                        </Paragraph>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>负责人: {task.assignee}</span>
-                          <span>截止时间: {task.dueDate}</span>
+              renderItem={task => {
+                const handleTaskStatusChange = (newStatus: string) => {
+                  // 发送协作事件
+                  collaboration.updateTask(task.id, {
+                    action: 'status_change',
+                    oldStatus: task.status,
+                    newStatus,
+                    title: task.title
+                  });
+                  
+                  message.success(`任务状态已更新为: ${getTaskStatusTag(newStatus).props.children}`);
+                };
+                
+                const handleTaskEdit = () => {
+                  // 发送协作事件
+                  collaboration.updateTask(task.id, {
+                    action: 'edit',
+                    title: task.title
+                  });
+                };
+                
+                return (
+                  <List.Item
+                    actions={[
+                      <Button 
+                        type="link" 
+                        icon={<EditOutlined />}
+                        onClick={handleTaskEdit}
+                      >
+                        编辑
+                      </Button>,
+                      <Button type="link" danger icon={<DeleteOutlined />}>删除</Button>,
+                      <Select
+                        value={task.status}
+                        size="small"
+                        style={{ width: 100 }}
+                        onChange={handleTaskStatusChange}
+                      >
+                        <Select.Option value="todo">待办</Select.Option>
+                        <Select.Option value="inprogress">进行中</Select.Option>
+                        <Select.Option value="review">待审核</Select.Option>
+                        <Select.Option value="completed">已完成</Select.Option>
+                      </Select>
+                    ]}
+                  >
+                    <List.Item.Meta
+                      title={
+                        <div className="flex items-center justify-between">
+                          <span>{task.title}</span>
+                          <Space>
+                            {getTaskStatusTag(task.status)}
+                            {getPriorityTag(task.priority)}
+                          </Space>
                         </div>
-                      </div>
-                    }
-                  />
-                </List.Item>
-              )}
+                      }
+                      description={
+                        <div>
+                          <Paragraph ellipsis={{ rows: 2 }} className="mb-2">
+                            {task.description}
+                          </Paragraph>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span>负责人: {task.assignee}</span>
+                            <span>截止时间: {task.dueDate}</span>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </List.Item>
+                );
+              }}
             />
           </Card>
-        </TabPane>
-
-        {/* 团队成员 */}
-        <TabPane tab="团队成员" key="members">
+             )
+           },
+           {
+             key: 'members',
+             label: '团队成员',
+             children: (
           <Card 
             title="成员管理" 
             extra={
@@ -584,8 +793,10 @@ const ProjectCollaboration: React.FC = () => {
               )}
             />
           </Card>
-        </TabPane>
-      </Tabs>
+             )
+           }
+         ]}
+       />
 
       {/* 邀请成员模态框 */}
       <Modal

@@ -12,6 +12,16 @@ import ProjectCollaboration from '@/pages/ProjectCollaboration';
 import UserCenter from '@/pages/UserCenter';
 import CoreAssets from '@/pages/CoreAssets';
 import VocabularyManagement from '@/pages/VocabularyManagement';
+import CodeAnalysis from '@/pages/CodeAnalysis';
+import EntityModel from '@/pages/EntityModel';
+import SystemArchitecture from '@/pages/SystemArchitecture';
+import PluginMarketplace from '@/pages/PluginMarketplace';
+import KnowledgeBase from '@/pages/KnowledgeBase';
+import ProjectManagement from '@/pages/ProjectManagement';
+import UserManagement from '@/pages/UserManagement';
+import TestPlatform from '@/pages/TestPlatform';
+import DeploymentPlatform from '@/pages/DeploymentPlatform';
+import MermaidTest from '@/pages/MermaidTest';
 import { initializeStores } from '@/stores';
 
 // Ant Design 主题配置
@@ -58,7 +68,17 @@ export default function App() {
             <Route path="/templates" element={<TemplateCenter />} />
             <Route path="/collaboration" element={<ProjectCollaboration />} />
             <Route path="/vocabulary" element={<VocabularyManagement />} />
+            <Route path="/code/analysis" element={<CodeAnalysis />} />
+            <Route path="/entity/model" element={<EntityModel />} />
+            <Route path="/system/architecture" element={<SystemArchitecture />} />
             <Route path="/profile" element={<UserCenter />} />
+            <Route path="/plugins" element={<PluginMarketplace />} />
+            <Route path="/knowledge" element={<KnowledgeBase />} />
+            <Route path="/project/management" element={<ProjectManagement />} />
+            <Route path="/user/management" element={<UserManagement />} />
+            <Route path="/test/platform" element={<TestPlatform />} />
+            <Route path="/deployment/platform" element={<DeploymentPlatform />} />
+            <Route path="/mermaid/test" element={<MermaidTest />} />
             <Route path="/mcp/console" element={
               <div className="p-6">
                 <h2>MCP协议控制台</h2>

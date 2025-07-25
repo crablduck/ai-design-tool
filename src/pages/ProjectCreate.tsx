@@ -20,6 +20,10 @@ import {
   FileImageOutlined,
   RocketOutlined,
   SettingOutlined,
+  GithubOutlined,
+  BranchesOutlined,
+  LinkOutlined,
+  KeyOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { UploadProps } from 'antd';
@@ -35,6 +39,14 @@ interface ProjectFormData {
   type: string;
   techStack: string[];
   generateOptions: string[];
+  gitConfig?: {
+    enabled: boolean;
+    repositoryUrl?: string;
+    branch?: string;
+    accessToken?: string;
+    autoCommit?: boolean;
+    commitMessage?: string;
+  };
 }
 
 const ProjectCreate: React.FC = () => {
@@ -61,6 +73,11 @@ const ProjectCreate: React.FC = () => {
       title: '项目配置',
       icon: <SettingOutlined />,
       description: '设置项目参数和生成选项',
+    },
+    {
+      title: 'Git集成',
+      icon: <GithubOutlined />,
+      description: '配置Git仓库和版本控制',
     },
     {
       title: '开始生成',
@@ -305,6 +322,121 @@ const ProjectCreate: React.FC = () => {
                   ]}
                 />
               </Form.Item>
+            </Form>
+          </Card>
+        );
+
+      case 4:
+        return (
+          <Card className="mb-6">
+            <Title level={4} className="mb-4">
+              <GithubOutlined className="mr-2" />
+              Git集成配置
+            </Title>
+            <Form form={form} layout="vertical">
+              <Form.Item
+                name={['gitConfig', 'enabled']}
+                valuePropName="checked"
+              >
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 text-blue-600 rounded"
+                    onChange={(e) => {
+                      const gitConfig = form.getFieldValue('gitConfig') || {};
+                      form.setFieldValue('gitConfig', { ...gitConfig, enabled: e.target.checked });
+                    }}
+                  />
+                  <span className="text-base font-medium">启用Git集成</span>
+                  <Text type="secondary">(可选)</Text>
+                </div>
+              </Form.Item>
+              
+              {form.getFieldValue(['gitConfig', 'enabled']) && (
+                <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+                  <Row gutter={16}>
+                    <Col span={16}>
+                      <Form.Item
+                        name={['gitConfig', 'repositoryUrl']}
+                        label="Git仓库地址"
+                        rules={[
+                          { required: true, message: '请输入Git仓库地址' },
+                          { type: 'url', message: '请输入有效的URL地址' }
+                        ]}
+                      >
+                        <Input
+                          prefix={<LinkOutlined />}
+                          placeholder="https://github.com/username/repository.git"
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item
+                        name={['gitConfig', 'branch']}
+                        label="目标分支"
+                        initialValue="main"
+                      >
+                        <Input
+                          prefix={<BranchesOutlined />}
+                          placeholder="main"
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  
+                  <Form.Item
+                    name={['gitConfig', 'accessToken']}
+                    label="访问令牌"
+                    extra="用于访问私有仓库，建议使用Personal Access Token"
+                  >
+                    <Input.Password
+                      prefix={<KeyOutlined />}
+                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                    />
+                  </Form.Item>
+                  
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        name={['gitConfig', 'autoCommit']}
+                        valuePropName="checked"
+                        initialValue={true}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 text-blue-600 rounded"
+                            defaultChecked
+                          />
+                          <span>自动提交生成的文档</span>
+                        </div>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name={['gitConfig', 'commitMessage']}
+                        label="提交信息"
+                        initialValue="docs: Add generated project documentation"
+                      >
+                        <Input placeholder="提交信息" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  
+                  <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-400">
+                    <Title level={5} className="text-blue-700 mb-2">
+                      <GithubOutlined className="mr-1" />
+                      Git集成功能
+                    </Title>
+                    <ul className="text-blue-600 text-sm space-y-1 mb-0">
+                      <li>• 自动将生成的文档推送到指定Git仓库</li>
+                      <li>• 支持GitHub、GitLab、Gitee等Git托管平台</li>
+                      <li>• 可配置目标分支和提交信息</li>
+                      <li>• 支持私有仓库访问（需要访问令牌）</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </Form>
           </Card>
         );

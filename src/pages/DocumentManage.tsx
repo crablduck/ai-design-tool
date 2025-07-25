@@ -202,29 +202,45 @@ const DocumentManage: React.FC = () => {
     });
   };
 
-  const actionMenu = (document: Document) => (
-    <Menu>
-      <Menu.Item key="preview" icon={<EyeOutlined />} onClick={() => handlePreview(document)}>
-        预览
-      </Menu.Item>
-      <Menu.Item key="edit" icon={<EditOutlined />}>
-        编辑
-      </Menu.Item>
-      <Menu.Item key="download" icon={<DownloadOutlined />} onClick={() => handleDownload(document)}>
-        下载
-      </Menu.Item>
-      <Menu.Item key="share" icon={<ShareAltOutlined />} onClick={() => handleShare(document)}>
-        分享
-      </Menu.Item>
-      <Menu.Item key="copy" icon={<CopyOutlined />}>
-        复制
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="delete" icon={<DeleteOutlined />} danger>
-        删除
-      </Menu.Item>
-    </Menu>
-  );
+  const getActionMenuItems = (document: Document) => [
+    {
+      key: 'preview',
+      label: '预览',
+      icon: <EyeOutlined />,
+      onClick: () => handlePreview(document)
+    },
+    {
+      key: 'edit',
+      label: '编辑',
+      icon: <EditOutlined />
+    },
+    {
+      key: 'download',
+      label: '下载',
+      icon: <DownloadOutlined />,
+      onClick: () => handleDownload(document)
+    },
+    {
+      key: 'share',
+      label: '分享',
+      icon: <ShareAltOutlined />,
+      onClick: () => handleShare(document)
+    },
+    {
+      key: 'copy',
+      label: '复制',
+      icon: <CopyOutlined />
+    },
+    {
+      type: 'divider' as const
+    },
+    {
+      key: 'delete',
+      label: '删除',
+      icon: <DeleteOutlined />,
+      danger: true
+    }
+  ];
 
   const columns: ColumnsType<Document> = [
     {
@@ -314,7 +330,7 @@ const DocumentManage: React.FC = () => {
               onClick={() => handleDownload(record)}
             />
           </Tooltip>
-          <Dropdown overlay={actionMenu(record)} trigger={['click']}>
+          <Dropdown menu={{ items: getActionMenuItems(record) }} trigger={['click']}>
             <Button type="text" icon={<MoreOutlined />} />
           </Dropdown>
         </Space>

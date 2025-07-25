@@ -33,7 +33,7 @@ import {
   ClusterOutlined,
   ApiOutlined
 } from '@ant-design/icons';
-import MermaidChart from '../Chart/MermaidChart';
+import { MermaidChart } from '../Chart/MermaidChart';
 import { documentEngine } from '../../services/DocumentEngine';
 import type { 
   DomainModel, 

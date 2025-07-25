@@ -34,7 +34,7 @@ import {
 const { Title, Text, Paragraph } = Typography;
 const { Search } = Input;
 const { Option } = Select;
-const { TabPane } = Tabs;
+// const { TabPane } = Tabs; // 已弃用，使用items属性替代
 
 interface Template {
   id: string;
@@ -380,33 +380,40 @@ const TemplateCenter: React.FC = () => {
 
       {/* 分类标签 */}
       <Card className="mb-6">
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="全部模板" key="all" />
-          <TabPane 
-            tab={
-              <span>
-                <FireOutlined /> 热门推荐
-              </span>
-            } 
-            key="popular" 
-          />
-          <TabPane 
-            tab={
-              <span>
-                <CrownOutlined /> 高级模板
-              </span>
-            } 
-            key="premium" 
-          />
-          <TabPane 
-            tab={
-              <span>
-                <GiftOutlined /> 免费模板
-              </span>
-            } 
-            key="free" 
-          />
-        </Tabs>
+        <Tabs 
+          activeKey={activeTab} 
+          onChange={setActiveTab}
+          items={[
+            {
+              key: 'all',
+              label: '全部模板'
+            },
+            {
+              key: 'popular',
+              label: (
+                <span>
+                  <FireOutlined /> 热门推荐
+                </span>
+              )
+            },
+            {
+              key: 'premium',
+              label: (
+                <span>
+                  <CrownOutlined /> 高级模板
+                </span>
+              )
+            },
+            {
+              key: 'free',
+              label: (
+                <span>
+                  <GiftOutlined /> 免费模板
+                </span>
+              )
+            }
+          ]}
+        />
       </Card>
 
       {/* 模板网格 */}

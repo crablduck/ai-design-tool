@@ -3,7 +3,7 @@ import { BookOpen, Network, MessageCircle, Box, Grid, List } from 'lucide-react'
 import VocabularyManager from '../components/VocabularyManager/VocabularyManager';
 import VocabularyGraph from '../components/VocabularyManager/VocabularyGraph';
 import QASystem from '../components/QASystem/QASystem';
-import DomainModel3D from '../components/DomainModel3D/DomainModel3D';
+import DomainModel3D from '../components/DomainModel3D';
 import { VocabularyTerm, VocabularyRelationship, Entity3D, Relationship3D } from '../types/document';
 
 type ViewMode = 'manager' | 'graph' | 'qa' | '3d';

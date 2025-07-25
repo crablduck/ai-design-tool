@@ -77,46 +77,94 @@ const MermaidChartComponent: React.FC<MermaidChartProps> = ({
   // 渲染图表
   useEffect(() => {
     const renderChart = async () => {
-      if (!chartRef.current || !chart.code) return;
+      console.log('MermaidChart: renderChart called', {
+        hasContainer: !!chartRef.current,
+        hasCode: !!chart.code,
+        chartId: chart.id,
+        chartType: chart.type
+      });
 
+      if (!chartRef.current || !chart.code) {
+        console.log('MermaidChart: Missing container or code - skipping render');
+        setLoading(false);
+        return;
+      }
+
+      console.log('MermaidChart: Starting render process');
+      console.log('MermaidChart: Chart code to render:', chart.code);
+      
       setLoading(true);
       setError(null);
 
       try {
-        // 清空容器
-        chartRef.current.innerHTML = '';
+        // 清空容器但保留一些调试信息
+        if (chartRef.current) {
+          chartRef.current.innerHTML = '<div style="color: blue; padding: 10px;">正在渲染图表...</div>';
+        }
         
         // 生成唯一ID
         const chartId = `mermaid-${chart.id}-${Date.now()}`;
+        console.log('MermaidChart: Using chart ID:', chartId);
         
-        // 验证Mermaid语法
-        const isValid = await mermaid.parse(chart.code);
-        if (!isValid) {
-          throw new Error('Invalid Mermaid syntax');
-        }
-
+        // 验证mermaid是否可用
+        console.log('MermaidChart: Mermaid object:', mermaid);
+        console.log('MermaidChart: Mermaid version:', mermaid?.version || 'unknown');
+        
+        // 更长的延迟确保DOM准备就绪
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        console.log('MermaidChart: About to call mermaid.render()');
+        
         // 渲染图表
-        const { svg } = await mermaid.render(chartId, chart.code);
-        chartRef.current.innerHTML = svg;
-
-        // 应用缩放
-        const svgElement = chartRef.current.querySelector('svg');
-        if (svgElement) {
-          svgElement.style.transform = `scale(${zoom})`;
-          svgElement.style.transformOrigin = 'top left';
-          svgElement.style.width = `${100 / zoom}%`;
-          svgElement.style.height = `${100 / zoom}%`;
+        const result = await mermaid.render(chartId, chart.code);
+        console.log('MermaidChart: Render result:', result);
+        
+        if (result && result.svg) {
+          console.log('MermaidChart: SVG generated, length:', result.svg.length);
+          
+          if (chartRef.current) {
+            chartRef.current.innerHTML = result.svg;
+            
+            // 应用缩放
+            const svgElement = chartRef.current.querySelector('svg');
+            if (svgElement) {
+              console.log('MermaidChart: Applying zoom:', zoom);
+              svgElement.style.transform = `scale(${zoom})`;
+              svgElement.style.transformOrigin = 'top left';
+              svgElement.style.width = `${100 / zoom}%`;
+              svgElement.style.height = `${100 / zoom}%`;
+            } else {
+              console.warn('MermaidChart: No SVG element found in rendered result');
+            }
+            
+            console.log('MermaidChart: Render completed successfully');
+            setLoading(false);
+          } else {
+            console.error('MermaidChart: chartRef.current is null after render');
+            setError('Chart container lost during render');
+            setLoading(false);
+          }
+        } else {
+          console.error('MermaidChart: Invalid render result:', result);
+          setError('Invalid render result from Mermaid');
+          setLoading(false);
         }
-
-        setLoading(false);
-      } catch {
-        console.error('Mermaid rendering error');
-        setError('Failed to render chart');
+      } catch (error) {
+        console.error('MermaidChart: Rendering error details:', {
+          error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+          chartCode: chart.code,
+          chartType: chart.type
+        });
+        setError(`渲染失败: ${error instanceof Error ? error.message : '未知错误'}`);
         setLoading(false);
       }
     };
 
-    renderChart();
+    // 使用更长的延迟确保组件完全挂载
+    const timer = setTimeout(renderChart, 100);
+    return () => clearTimeout(timer);
   }, [chart.code, chart.id, zoom]);
 
   // 复制图表代码
@@ -298,7 +346,7 @@ const MermaidChartComponent: React.FC<MermaidChartProps> = ({
       >
         {loading && (
           <div className="flex items-center justify-center h-full">
-            <Spin size="large" tip="Rendering chart..." />
+            <Spin size="large">Rendering chart...</Spin>
           </div>
         )}
         
@@ -349,7 +397,7 @@ const MermaidChartComponent: React.FC<MermaidChartProps> = ({
     <Card 
       title={chart.title}
       className={className}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
     >
       {chartContent}
     </Card>
@@ -357,3 +405,4 @@ const MermaidChartComponent: React.FC<MermaidChartProps> = ({
 };
 
 export default MermaidChartComponent;
+export { MermaidChartComponent as MermaidChart };

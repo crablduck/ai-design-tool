@@ -36,6 +36,7 @@ export class DocumentEngine {
   private initializeCoreDocumentTypes() {
     // 注册用例图文档类型
     this.registerDocumentType({
+      id: 'usecase',
       type: 'usecase',
       name: 'Use Case Diagram',
       description: 'UML Use Case diagram for capturing functional requirements',
@@ -50,6 +51,7 @@ export class DocumentEngine {
 
     // 注册领域模型文档类型
     this.registerDocumentType({
+      id: 'domain-model',
       type: 'domain-model',
       name: 'Domain Model',
       description: 'Domain-driven design model with entities, value objects, and aggregates',
@@ -283,6 +285,7 @@ export class DocumentEngine {
   private registerCoreDocumentTypes(): void {
     // 序列图
     this.registerDocumentType({
+      id: 'sequence',
       type: 'sequence',
       name: 'Sequence Diagram',
       description: 'UML Sequence diagram for interaction flows',
@@ -296,6 +299,7 @@ export class DocumentEngine {
 
     // 类图
     this.registerDocumentType({
+      id: 'class',
       type: 'class',
       name: 'Class Diagram',
       description: 'UML Class diagram for system structure',
@@ -309,6 +313,7 @@ export class DocumentEngine {
 
     // API文档
     this.registerDocumentType({
+      id: 'api-spec',
       type: 'api-spec',
       name: 'API Specification',
       description: 'RESTful API documentation',
@@ -322,6 +327,7 @@ export class DocumentEngine {
 
     // 数据库设计
     this.registerDocumentType({
+      id: 'database',
       type: 'database',
       name: 'Database Design',
       description: 'Database schema and relationships',

@@ -64,14 +64,43 @@
 - [ ] 📤 多格式导出系统 (Multi-format Export)
 - [ ] 🔄 版本控制系统 (Version Control)
 
-### 阶段五：MCP协议集成 (Phase 5) - **AI Agent友好**
+### 阶段五：MCP插件生态系统 (Phase 5) - **AI Agent友好**
+- [ ] 🔌 MCP插件市场 (MCP Plugin Marketplace)
+  - [ ] 插件注册和发布系统
+  - [ ] 插件搜索和分类
+  - [ ] 插件评分和评论
+  - [ ] 插件版本管理
+- [ ] 🔌 核心MCP插件开发
+  - [ ] 用例图生成插件 (UseCase Generator Plugin)
+  - [ ] 领域模型插件 (Domain Model Plugin)
+  - [ ] 代码分析插件 (Code Analysis Plugin)
+  - [ ] 文档生成插件 (Document Generator Plugin)
+  - [ ] 系统架构插件 (Architecture Plugin)
 - [ ] 🔌 MCP服务器实现 (MCP Server Implementation)
 - [ ] 🔌 标准化API接口 (Standardized API)
 - [ ] 🔌 Agent调用示例 (Agent Integration Examples)
-- [ ] 🔌 文档和SDK (Documentation & SDK)
+- [ ] 🔌 插件开发SDK (Plugin Development SDK)
 - [ ] 🔌 Cursor插件开发 (Cursor Plugin)
 
-### 阶段六：优化和完善 (Phase 6)
+### 阶段六：技术知识库系统 (Phase 6) - **技术栈沉淀**
+- [ ] 📚 技术手册文档系统
+  - [ ] 开发技术手册 (Development Handbook)
+  - [ ] 架构设计手册 (Architecture Handbook)
+  - [ ] 最佳实践指南 (Best Practices Guide)
+  - [ ] 代码规范文档 (Coding Standards)
+  - [ ] 部署运维手册 (DevOps Handbook)
+- [ ] 📚 技术栈知识图谱
+  - [ ] 技术栈关系图
+  - [ ] 依赖关系分析
+  - [ ] 技术演进路径
+  - [ ] 学习路径推荐
+- [ ] 📚 知识库管理
+  - [ ] 文档版本控制
+  - [ ] 知识搜索引擎
+  - [ ] 标签分类系统
+  - [ ] 协作编辑功能
+
+### 阶段七：优化和完善 (Phase 7)
 - [ ] 📱 响应式设计优化
 - [ ] ⚡ 性能优化 (图表渲染、大数据处理)
 - [ ] 🧪 单元测试和集成测试
@@ -80,7 +109,8 @@
 
 ## 🛠️ 重构后技术架构
 
-### 核心技术栈
+### 🏗️ 开发技术架构 (Development Architecture)
+#### 核心技术栈
 - **前端框架**: React 18 + TypeScript + Vite
 - **UI组件库**: Ant Design (企业级组件)
 - **图表引擎**: Mermaid (统一图表生成)
@@ -88,6 +118,18 @@
 - **状态管理**: Zustand (轻量级状态管理)
 - **路由**: React Router v6
 - **样式**: Tailwind CSS + CSS Modules
+- **后端框架**: Node.js + Express + TypeScript
+- **数据库**: MongoDB + Redis (缓存)
+- **MCP协议**: 自定义MCP服务器实现
+- **插件系统**: 动态加载 + 沙箱隔离
+
+### 🎯 逻辑架构 (Logical Architecture)
+#### 分层设计
+- **表现层 (Presentation Layer)**: React组件 + 页面路由
+- **业务逻辑层 (Business Logic Layer)**: 核心业务资产管理 + 文档生成引擎
+- **服务层 (Service Layer)**: MCP插件服务 + 第三方集成
+- **数据访问层 (Data Access Layer)**: 数据持久化 + 缓存管理
+- **基础设施层 (Infrastructure Layer)**: 文件系统 + 网络通信
 
 ### 可扩展文档生成引擎架构
 ```typescript
@@ -165,6 +207,17 @@ interface ChartGenerator {
 │   ├── MermaidEditor/       // Mermaid编辑器
 │   ├── ChartPreview/        // 图表预览
 │   └── StyleCustomizer/     // 样式定制
+├── PluginMarketplace/       // MCP插件市场
+│   ├── PluginStore/         // 插件商店
+│   ├── PluginDetails/       // 插件详情
+│   ├── PluginDeveloper/     // 插件开发
+│   └── PluginManager/       // 已安装插件管理
+├── KnowledgeBase/           // 技术知识库
+│   ├── TechHandbook/        // 技术手册
+│   ├── ArchitectureGuide/   // 架构指南
+│   ├── BestPractices/       // 最佳实践
+│   ├── TechStackGraph/      // 技术栈图谱
+│   └── LearningPath/        // 学习路径
 └── Integration/
     ├── MCPServer/           // MCP服务器管理
     ├── APIGateway/          // API网关
@@ -190,7 +243,14 @@ interface ChartGenerator {
 ├── mcp/
 │   ├── MCPServer.ts         // MCP服务器实现
 │   ├── MCPClient.ts         // MCP客户端
+│   ├── PluginMarketplace.ts // 插件市场管理
+│   ├── PluginInstaller.ts   // 插件安装器
 │   └── AgentInterface.ts    // Agent接口
+├── knowledge/
+│   ├── TechHandbookManager.ts // 技术手册管理
+│   ├── KnowledgeGraph.ts    // 知识图谱
+│   ├── SearchEngine.ts      // 知识搜索引擎
+│   └── LearningPathGenerator.ts // 学习路径生成
 ├── utils/
 │   ├── file-handler.ts      // 文件处理
 │   ├── export-utils.ts      // 导出工具
@@ -200,7 +260,9 @@ interface ChartGenerator {
     ├── core.ts              // 核心类型定义
     ├── charts.ts            // 图表类型
     ├── assets.ts            // 业务资产类型
-    └── mcp.ts               // MCP协议类型
+    ├── mcp.ts               // MCP协议类型
+    ├── plugins.ts           // 插件类型定义
+    └── knowledge.ts         // 知识库类型定义
 ```
 
 ## 🎨 设计系统 (面向业务资产)
@@ -268,8 +330,52 @@ const customDoc = await mcpClient.generateDocument('api-spec', {
 ### 当前状态 (重新评估)
 - ✅ 项目初始化完成
 - ✅ 基础依赖配置完成
+- ✅ 基础页面组件已实现 (ProjectCreate, DocumentGenerate, CoreAssets, EntityModel, SystemArchitecture, CodeAnalysis, TemplateCenter)
+- ✅ Mermaid图表预览功能已实现 (用例图、领域模型、ER图、系统架构图)
 - 🔄 **需要重构**: 按新架构重新设计
 - 🎯 **核心目标**: 可扩展 + 业务资产 + Mermaid + MCP
+
+### 🚨 当前项目未实现的核心功能
+
+#### 🔴 高优先级 (核心功能缺失)
+1. **真实Git集成** - 当前只有模拟的Git配置界面
+2. **AI分析引擎** - 文档生成页面的AI分析是模拟的
+3. **代码分析引擎** - 代码分析页面无法真实分析代码
+4. **业务流程Mermaid预览** - 核心资产页面中业务流程缺少Mermaid预览
+5. **真实文件上传处理** - 原型图上传和代码文件上传都是模拟的
+6. **实际文档生成** - 所有文档生成都是静态模拟数据
+7. **数据持久化** - 所有数据都是内存中的模拟数据，刷新后丢失
+
+#### 🟡 中优先级 (功能增强)
+1. **用户认证系统** - 无登录/注册功能
+2. **项目管理** - 无法保存和管理多个项目
+3. **模板系统** - 模板中心的模板无法真实使用
+4. **导出功能** - 各种导出功能都是模拟的
+5. **版本控制** - 文档和资产的版本管理
+6. **协作功能** - 多人协作编辑
+7. **搜索功能** - 全局搜索和过滤
+
+#### 🟢 低优先级 (体验优化)
+1. **主题切换** - 深色/浅色主题
+2. **国际化** - 多语言支持
+3. **快捷键** - 键盘快捷键支持
+4. **拖拽功能** - 文件拖拽上传
+5. **实时预览** - 编辑时的实时预览
+6. **性能优化** - 大文件处理和渲染优化
+
+### 📊 功能完整度评估
+- **前端UI**: 85% (页面结构完整，交互基本实现)
+- **后端功能**: 5% (几乎全部是模拟数据)
+- **数据持久化**: 0% (无数据库集成)
+- **第三方集成**: 10% (Git、AI服务都是模拟的)
+- **核心业务逻辑**: 30% (基础框架存在，但缺少实际处理)
+
+### 🎯 开发优先级建议
+1. **第一阶段**: 实现数据持久化和基础后端API
+2. **第二阶段**: 集成真实的AI分析和代码分析引擎
+3. **第三阶段**: 实现Git集成和文件处理
+4. **第四阶段**: 完善用户系统和项目管理
+5. **第五阶段**: 优化用户体验和性能
 
 ### 重构后预计时间线
 - **阶段一 (架构搭建)**: 3-4天

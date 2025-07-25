@@ -70,7 +70,12 @@ const VocabularyGraph: React.FC<VocabularyGraphProps> = ({
         face: 'Arial'
       },
       shape: 'box',
-      margin: 10,
+      margin: {
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10
+      },
       widthConstraint: {
         minimum: 100,
         maximum: 200
@@ -96,6 +101,7 @@ const VocabularyGraph: React.FC<VocabularyGraphProps> = ({
         strokeColor: '#ffffff'
       },
       smooth: {
+        enabled: true,
         type: 'curvedCW',
         roundness: 0.2
       }
